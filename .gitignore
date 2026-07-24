@@ -4,7 +4,15 @@ __pycache__/
 .venv/
 venv/
 .env
+.env.*
+!.env.example
 config.yaml
+config.local.*
+secrets.*
+credentials.*
+*.pem
+*.key
+*.p12
 data/
 generated/
 reports/

@@ -8,6 +8,7 @@
 .input-row { display: flex; gap: 12rpx; }
 .input-row input { flex: 1; background: #f4f6f4; border-radius: 20rpx; padding: 0 20rpx; }
 .send { width: 140rpx; background: #2e6b55; color: #fff; font-size: 26rpx; }
+.skip { width: 170rpx; background: #fff; color: #2e6b55; border: 1rpx solid #dceee5; font-size: 24rpx; }
 .controls { display: flex; justify-content: center; margin-top: 30rpx; }
 .start { width: 280rpx; }
 .interrupt { width: 116rpx; height: 116rpx; padding: 0; border-radius: 58rpx; background: #f38b72; color: #fff; font-size: 42rpx; }

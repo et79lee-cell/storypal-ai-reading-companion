@@ -5,6 +5,13 @@
   "age_range": "6–10 岁",
   "emoji": "🌟",
   "theme": "forest",
+  "target_age": "6–10 岁",
+  "learning_goals": [
+    "在故事情境中表达问题和想法",
+    "理解角色感受及其原因",
+    "从不同角色的行动中梳理合作逻辑",
+    "用有顺序的语言复述解决问题的过程"
+  ],
   "nodes": [
     {
       "id": "forest-night",
@@ -17,8 +24,32 @@
     },
     {
       "id": "first-thought",
-      "type": "interaction",
-      "prompt": "如果你是米粒，你会先问小星星什么？"
+      "type": "proactive_question",
+      "question_design": {
+        "trigger_reason": "发现迷路的小星星后，剧情第一次自然停顿，适合进入角色视角和情绪理解。",
+        "selection_policy": "least_exposed_dimension_in_session",
+        "follow_up_policy": "one_scaffold_then_continue",
+        "candidates": [
+          {
+            "question_id": "first-thought-imagination",
+            "prompt": "如果你是米粒，你会先问小星星什么？",
+            "primary_dimension": "imagination",
+            "dimensions": ["imagination", "expression"],
+            "question_type": "perspective_taking",
+            "learning_goal": "从角色视角生成问题，并用完整语言表达。",
+            "scaffold_prompt": "可以先想想：它从哪里来，或者它现在最需要什么？"
+          },
+          {
+            "question_id": "first-thought-emotion",
+            "prompt": "小星星一个人落在陌生的森林里，它现在可能是什么心情？为什么？",
+            "primary_dimension": "emotional_understanding",
+            "dimensions": ["emotional_understanding", "logic"],
+            "question_type": "emotion_and_reason",
+            "learning_goal": "识别角色情绪，并用故事线索说明原因。",
+            "scaffold_prompt": "它可能有点害怕，也可能很着急。你觉得哪一种更像？"
+          }
+        ]
+      }
     },
     {
       "id": "find-the-way",
@@ -31,8 +62,32 @@
     },
     {
       "id": "second-thought",
-      "type": "interaction",
-      "prompt": "米粒为什么要请不同的朋友一起帮忙？"
+      "type": "proactive_question",
+      "question_design": {
+        "trigger_reason": "角色共同找到方向后，适合回看证据、行动顺序和合作方式。",
+        "selection_policy": "least_exposed_dimension_in_session",
+        "follow_up_policy": "one_scaffold_then_continue",
+        "candidates": [
+          {
+            "question_id": "second-thought-logic",
+            "prompt": "米粒为什么要请不同的朋友一起帮忙？",
+            "primary_dimension": "logic",
+            "dimensions": ["logic", "emotional_understanding"],
+            "question_type": "cause_and_effect",
+            "learning_goal": "从角色能力和行动结果中梳理合作的因果关系。",
+            "scaffold_prompt": "想想猫头鹰和萤火虫分别做了什么，它们会的事情一样吗？"
+          },
+          {
+            "question_id": "second-thought-expression",
+            "prompt": "你能用“先、然后、最后”说说大家是怎样帮小星星找到方向的吗？",
+            "primary_dimension": "big_chinese",
+            "dimensions": ["big_chinese", "expression", "logic"],
+            "question_type": "sequenced_retelling",
+            "learning_goal": "用顺序词复述解决问题的过程。",
+            "scaffold_prompt": "可以从“先请猫头鹰……”开始，再说萤火虫做了什么。"
+          }
+        ]
+      }
     },
     {
       "id": "home-again",

@@ -3,12 +3,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .providers import MockCompanionProvider
+from .memory import InMemoryMemoryRepository
 from .story_engine import StorySession, StoryStateError
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +28,7 @@ def load_stories() -> dict[str, dict[str, Any]]:
 
 stories = load_stories()
 sessions: dict[str, StorySession] = {}
+memory_repository = InMemoryMemoryRepository()
 app = FastAPI(title="StoryPal AI Reading Companion", version="1.0.0")
 
 
@@ -56,6 +59,14 @@ async def session_report(session_id: str) -> dict[str, Any]:
     return sessions[session_id].report()
 
 
+@app.delete("/api/sessions/{session_id}")
+async def delete_session(session_id: str) -> dict[str, bool]:
+    existed = session_id in sessions
+    sessions.pop(session_id, None)
+    memory_repository.delete_session(session_id)
+    return {"deleted": existed}
+
+
 @app.websocket("/ws")
 @app.websocket("/ws/miniapp")
 async def story_socket(websocket: WebSocket) -> None:
@@ -70,7 +81,14 @@ async def story_socket(websocket: WebSocket) -> None:
                     story_id = message.get("story_id", "lost-starlight")
                     if story_id not in stories:
                         raise StoryStateError("unknown story_id")
-                    session = StorySession(stories[story_id], MockCompanionProvider())
+                    session_id = uuid4().hex
+                    memory = memory_repository.create_session(session_id)
+                    session = StorySession(
+                        stories[story_id],
+                        MockCompanionProvider(),
+                        session_id=session_id,
+                        memory=memory,
+                    )
                     sessions[session.session_id] = session
                     events = session.start()
                 elif session is None:
@@ -81,6 +99,8 @@ async def story_socket(websocket: WebSocket) -> None:
                     events = session.interrupt()
                 elif command == "user_message":
                     events = await session.submit_message(str(message.get("text", "")))
+                elif command == "skip_proactive_question":
+                    events = session.skip_proactive_question()
                 elif command == "answer_complete":
                     events = session.answer_complete()
                 else:

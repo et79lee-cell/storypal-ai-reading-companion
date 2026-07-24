@@ -1,2 +1,2 @@
 const { baseUrl } = require('../../utils/config')
-Page({ data: { report: {} }, onLoad(options) { wx.request({ url: `${baseUrl()}/api/reports/${options.session}`, success: ({ data }) => this.setData({ report: data }) }) } })
+Page({ data: { report: { interactions: [], dimension_coverage: [] }, proactiveCount: 0, interruptCount: 0 }, onLoad(options) { wx.request({ url: `${baseUrl()}/api/reports/${options.session}`, success: ({ data }) => this.setData({ report: data, proactiveCount: (data.module_counts || {}).ai_proactive_question || 0, interruptCount: (data.module_counts || {}).user_interrupt_question || 0 }) }) } })

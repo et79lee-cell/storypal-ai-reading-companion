@@ -60,7 +60,7 @@ h2 { font-size: 34px; letter-spacing: -.03em; margin: 0 0 8px; }
 .state { margin: 14px 0 6px; color: var(--forest); font-size: 13px; font-weight: 750; }
 .sentence { font-family: "Songti SC", STSong, serif; min-height: 120px; font-size: 27px; line-height: 1.75; margin: 8px 0 18px; }
 .prompt { display: none; padding: 18px; background: #fff3d5; border-radius: 16px; margin: 14px 0; line-height: 1.6; }
-.input-row { display: none; grid-template-columns: 1fr auto; gap: 10px; margin-top: 12px; }
+.input-row { display: none; grid-template-columns: 1fr auto auto; gap: 10px; margin-top: 12px; }
 .input-row input { width: 100%; border: 1px solid var(--line); border-radius: 13px; padding: 13px 14px; outline: none; }
 .input-row input:focus { border-color: var(--forest); }
 .controls { display: flex; justify-content: center; gap: 12px; margin-top: 18px; }
@@ -82,6 +82,8 @@ h2 { font-size: 34px; letter-spacing: -.03em; margin: 0 0 8px; }
   .story-grid, .feature-grid { grid-template-columns: 1fr; }
   .section-head { display: block; }
   .sentence { font-size: 23px; }
+  .input-row { grid-template-columns: 1fr auto; }
+  .input-row input { grid-column: 1 / -1; }
   .metric-grid { grid-template-columns: 1fr; }
   .nav-note { display: none; }
 }
