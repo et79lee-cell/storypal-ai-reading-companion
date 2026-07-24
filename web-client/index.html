@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>StoryPal · AI 互动阅读伙伴</title>
+  <meta name="description" content="StoryPal 是支持儿童随时打断、即时问答并回到故事原句的 AI 互动阅读工作流。">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="shell nav"><a class="brand" href="/"><span class="brand-mark">S</span>StoryPal</a><span class="nav-note">公开作品集 · Mock-first · 无需 API Key</span></header>
+  <main>
+    <section class="shell hero">
+      <div><span class="eyebrow">● AI 应用产品原型</span><h1>让故事真正<br>听见孩子</h1><p class="lead">孩子可以在任意一句打断、提问或表达想法。AI 回答后准确回到原句，让一次线性播放变成可持续的理解与对话。</p><div class="actions"><a class="button" href="/player.html?story=lost-starlight">体验 3 分钟 Demo</a><a class="button secondary" href="https://github.com/et79lee-cell/storypal-ai-reading-companion">查看 GitHub</a></div></div>
+      <div class="visual" aria-label="原创故事迷路的星光插画"><div class="moon"></div><div class="hill"></div><div class="fox">🦊</div><div class="star">🌟</div><div class="visual-note">当前演示：原创故事《迷路的星光》<br>支持播放中断点恢复与引导式互动</div></div>
+    </section>
+    <section class="section tint"><div class="shell"><div class="section-head"><div><h2>从一个原创故事开始</h2><p class="sub">素材可公开、流程可复现，聚焦交互编排本身。</p></div></div><div id="stories" class="story-grid"><article class="story-card"><div class="cover">🌟</div><h3>迷路的星光</h3><p>跟随一颗落进森林的小星星，练习观察、表达和帮助他人。</p><div class="meta"><span class="pill">6–10 岁</span><a href="/player.html?story=lost-starlight">开始阅读 →</a></div></article></div></div></section>
+    <section class="shell section"><div class="section-head"><div><h2>核心产品闭环</h2><p class="sub">同一套状态机同时服务 Web 与微信小程序。</p></div></div><div class="feature-grid"><article class="feature"><span class="feature-icon">✋</span><h3>随时打断</h3><p>记录当前 node 与 sentence，停止播放并进入倾听态。</p></article><article class="feature"><span class="feature-icon">💬</span><h3>语境回答</h3><p>把孩子的问题和当前故事上下文交给可替换的 AI provider。</p></article><article class="feature"><span class="feature-icon">↩️</span><h3>准确续播</h3><p>回答结束回到原句，同时把互动记录沉淀为可解释报告。</p></article></div></section>
+  </main>
+  <footer class="footer"><div class="shell">StoryPal Public Portfolio Edition · 原创示例内容 · 本地优先 · MIT License</div></footer>
+  <script src="/static/index.js"></script>
+</body></html>

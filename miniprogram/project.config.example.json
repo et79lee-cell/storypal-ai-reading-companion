@@ -1,0 +1,8 @@
+{
+  "description": "StoryPal 微信小程序公开演示版",
+  "packOptions": {"ignore": []},
+  "setting": {"urlCheck": false, "es6": true, "postcss": true, "minified": true},
+  "compileType": "miniprogram",
+  "appid": "wx_your_app_id",
+  "projectname": "storypal-ai-reading-companion"
+}

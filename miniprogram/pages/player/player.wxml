@@ -1,0 +1,8 @@
+<view class="player-page">
+  <view class="art">🦊　🌟</view>
+  <view class="player card"><view class="track"><view class="bar" style="width:{{progress}}%"></view></view><text class="state">{{state}}</text><text class="sentence">{{text}}</text>
+    <view wx:if="{{showInput}}" class="input-row"><input value="{{message}}" bindinput="onInput" placeholder="输入问题或想法…" maxlength="120"/><button class="send" bindtap="sendMessage">发送</button></view>
+    <view class="controls"><button wx:if="{{!started}}" class="button start" bindtap="start">开始故事</button><button wx:else class="interrupt" bindtap="interrupt" disabled="{{!canInterrupt}}">✋</button></view>
+    <text class="hint">公开版用文字模拟 ASR，保留原小程序交互流程。</text>
+  </view>
+</view>

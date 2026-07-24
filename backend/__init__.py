@@ -1,0 +1,1 @@
+"""StoryPal public portfolio backend."""

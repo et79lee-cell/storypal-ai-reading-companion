@@ -1,0 +1,8 @@
+<view class="page">
+  <view class="hero"><text class="badge">AI 互动阅读</text><text class="title">让故事真正\n听见孩子</text><text class="desc">随时打断、语境问答、准确续播</text></view>
+  <view class="section-title">原创故事</view>
+  <view wx:for="{{stories}}" wx:key="id" class="story card" bindtap="openStory" data-id="{{item.id}}">
+    <view class="cover">{{item.emoji}}</view><view class="story-copy"><text class="story-title">{{item.title}}</text><text class="muted summary">{{item.summary}}</text><text class="age">{{item.age_range}}</text></view>
+  </view>
+  <view wx:if="{{error}}" class="notice">{{error}}</view>
+</view>

@@ -1,0 +1,18 @@
+{
+  "pages": ["pages/index/index", "pages/player/player", "pages/report/report", "pages/mine/mine"],
+  "window": {
+    "navigationBarTitleText": "StoryPal",
+    "navigationBarBackgroundColor": "#2e6b55",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#fffdf7"
+  },
+  "tabBar": {
+    "color": "#7a8a84",
+    "selectedColor": "#2e6b55",
+    "list": [
+      {"pagePath": "pages/index/index", "text": "故事馆"},
+      {"pagePath": "pages/mine/mine", "text": "关于"}
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}
