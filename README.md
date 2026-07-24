@@ -1,12 +1,12 @@
 # StoryPal AI Reading Companion
 
-> 一个支持“随时打断—语境回答—原句续播—互动报告”的儿童 AI 互动阅读工作流，同时提供 Web 与微信小程序界面。
+> 一个支持“随时打断—语境回答—原句续播—互动报告”的儿童 AI 互动阅读产品原型，同时提供 Web 与微信小程序界面。
 
-[English summary](#english-summary) · [架构](docs/architecture.md) · [消息协议](docs/protocol.md) · [安全边界](SECURITY.md)
+[产品逻辑](docs/product-logic.md) · [产品设计](docs/product-design.md) · [系统架构](docs/architecture.md) · [项目复盘](docs/case-study.md) · [消息协议](docs/protocol.md) · [安全边界](SECURITY.md)
 
 ## 60 秒看懂项目
 
-StoryPal 解决有声故事的一个具体问题：播放通常是单向的，孩子在听故事时产生的问题和想法无法进入内容流程。
+StoryPal 解决有声故事的一个具体问题：播放通常是单向的，孩子在听故事时产生的问题和想法无法进入内容流程。核心设计目标是在保留故事连续性的同时，让孩子能够自然进入对话，并在对话后无认知断点地回到故事。
 
 这个公开版把核心闭环做成可运行的状态机：
 
@@ -16,16 +16,36 @@ StoryPal 解决有声故事的一个具体问题：播放通常是单向的，�
 4. 回答完成后回到被打断的原句继续；
 5. 主动打断和引导式回答进入事实型互动报告。
 
-公开仓库默认运行 Mock provider，不需要模型密钥。浏览器用 `SpeechSynthesis` 演示朗读，文字输入模拟 ASR，便于任何人复现产品流程。
+公开仓库默认运行 Mock provider，不需要模型密钥。浏览器用 `SpeechSynthesis` 演示朗读，文字输入模拟 ASR，便于任何人复现产品流程。它验证的是 AI 应用的产品编排、跨端协议和异常状态控制，不把模型效果混同于产品闭环。
 
-## 产品界面
+## 产品决策摘要
+
+| 产品问题 | 设计决策 | 目的 |
+| --- | --- | --- |
+| 孩子在播放中产生问题 | 故事句播放时开放显著的打断入口 | 降低表达时机成本 |
+| AI 回答会打断叙事记忆 | 保存 `node_id + sentence_index`，回答后重播原句 | 恢复语境，避免错位续播 |
+| 所有节点都允许打断会产生状态冲突 | 仅 `playing + story node` 开放打断 | 保持状态可预期 |
+| 自由提问不足以推动理解 | 在故事结构中插入 `interaction node` | 同时支持主动探索与引导表达 |
+| 互动报告容易过度推断 | 只记录行为事实和对话时间线 | 避免把一次互动解释为能力诊断 |
+| 不同端各自管理游标容易漂移 | Backend 作为唯一状态来源 | 保证 Web 与小程序行为一致 |
+
+完整说明见 [产品逻辑](docs/product-logic.md) 和 [产品设计](docs/product-design.md)。
+
+## 产品界面与信息架构
 
 | Web 体验 | 微信小程序 |
 | --- | --- |
 | 故事馆、互动播放器、阅读报告 | 故事馆、播放器、报告、隐私说明 |
-| 可直接通过本地浏览器演示 | 保留原型的跨端产品形态和核心流程 |
+| 浏览器语音合成、文字模拟 ASR | 定时模拟播放完成、文字模拟 ASR |
+| 适合快速体验完整闭环 | 保留移动端原生触达形态和核心流程 |
 
 所有公开示例内容均为本仓库原创，无第三方故事、封面、录音或模型权重。
+
+```text
+故事馆 → 选择故事 → 互动播放器 ─┬→ 主动打断 → 输入问题 → AI 回答 → 原句续播
+                              ├→ 引导节点 → 表达想法 → AI 回答 → 下一节点
+                              └→ 故事结束 → 互动报告
+```
 
 ## 快速开始
 
@@ -55,32 +75,39 @@ python -m unittest discover -s tests -v
 
 真实 AppID 和 private config 已被 `.gitignore` 排除。
 
-## 架构与设计取舍
+## 核心架构
 
 ```mermaid
 flowchart LR
-  W[Web Client] -->|WebSocket| E[Story State Machine]
-  M[WeChat Mini Program] -->|WebSocket| E
-  E --> P[Provider Contract]
+  W[Web Client] -->|统一事件协议| G[FastAPI / WebSocket]
+  M[WeChat Mini Program] -->|统一事件协议| G
+  G --> E[StorySession State Machine]
+  E --> C[Structured Story Content]
+  E --> P[CompanionProvider Contract]
   P --> K[Mock Provider]
-  P -. private adapter .-> A[ASR / LLM / TTS]
-  E --> R[In-memory Report]
+  P -. 生产化扩展 .-> A[ASR / LLM / TTS]
+  E --> R[Fact-based Session Report]
 ```
 
-- **前端不管理故事状态**：两个客户端只发送意图和播放完成事件，续播位置由 backend 决定。
-- **AI 能力可替换**：产品工作流依赖 `CompanionProvider`，公开版默认实现为确定性的 Mock。
-- **显式状态转换**：乱序消息会返回可解释错误，避免并发播放、重复回答和错位续播。
-- **本地优先**：默认只监听 `127.0.0.1`；公开演示不上传录音，也不持久化儿童数据。
+- **Backend 持有状态**：两个客户端只上报意图与播放完成事件，故事游标由 `StorySession` 统一推进。
+- **内容结构化**：`story node` 负责叙事，`interaction node` 负责预设引导，内容和流程不写死在 UI 中。
+- **AI 能力可替换**：工作流只依赖 `CompanionProvider.answer()`，公开版以确定性 Mock 保证可复现。
+- **协议驱动跨端**：Web 与微信小程序消费同一事件，视觉实现不同，核心产品行为一致。
+- **显式状态转换**：乱序消息进入 `error` 分支，降低并发播放、重复回答和错位续播风险。
+- **本地安全默认值**：默认只监听 `127.0.0.1`；公开演示不上传录音，也不持久化儿童数据。
 
-详见 [docs/architecture.md](docs/architecture.md) 与 [docs/protocol.md](docs/protocol.md)。
+详见 [系统架构](docs/architecture.md) 与 [消息协议](docs/protocol.md)。
 
 ## 我负责的部分
 
-- 从儿童内容消费场景定义“打断—回答—续播”的核心体验；
-- 设计故事 node/sentence 数据模型和 WebSocket 消息协议；
-- 搭建可替换的 AI provider 边界及端到端状态机；
-- 实现 Web 与微信小程序两端原型和互动报告；
-- 将内部实验整理为无密钥、无第三方素材、可复现的公开作品集版本。
+- **产品定义**：从儿童听故事场景定义“打断—回答—续播”的核心体验、边界与成功条件；
+- **产品逻辑**：设计自由打断与预设引导两类互动、故事恢复规则、异常顺序和报告口径；
+- **系统设计**：设计 node/sentence 内容模型、统一 WebSocket 协议、状态机和 provider contract；
+- **交互设计**：实现 Web 与微信小程序的信息架构、关键状态反馈、移动端播放器与报告页面；
+- **AI Workflow 交付**：完成端到端可运行原型、测试和公开仓库工程化；
+- **公开合规**：移除密钥、真实 AppID、第三方素材和供应商实现，改为原创内容与 Mock-first 演示。
+
+项目过程与取舍见 [项目复盘](docs/case-study.md)。
 
 ## 当前边界
 
@@ -98,7 +125,7 @@ web-client/       零构建依赖的 Web 演示
 miniprogram/      微信小程序前端（四个页面）
 stories/          原创结构化示例故事
 tests/            核心流程与异常顺序测试
-docs/             架构与 WebSocket 协议
+docs/             产品逻辑、产品设计、架构、协议与项目复盘
 ```
 
 ## License
